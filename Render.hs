@@ -13,7 +13,11 @@ renderPlayer :: Player -> Picture
 renderPlayer p = renderAt (pPos p) $ Color blue $ rectangleUpperSolid 20 20
 
 renderPlatform :: Platform -> Picture
-renderPlatform = const Blank
+renderPlatform p = let
+  (l,b) = bL p
+  (r,t) = tR p
+  in color red $ Polygon [(l,b),(r,b),(r,t),(l,t)]
+  
 
-renderAt :: Pos -> Picture -> Picture
-renderAt (Po x y) p = Translate (fromIntegral x) (fromIntegral y) p
+renderAt :: Point -> Picture -> Picture
+renderAt (x,y) p = Translate x y p

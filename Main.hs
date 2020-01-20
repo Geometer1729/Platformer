@@ -11,6 +11,6 @@ main = do
 
 world :: World
 world = World {
-  player = Player {pPos = Po 100 100} ,
+  player = Player {pPos = (0,0)} ,
   platforms = []
 }

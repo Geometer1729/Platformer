@@ -1,16 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Types where
 
-data Pos = Po Int Int
-
-instance Semigroup Pos where
-  (Po x y) <> (Po a b) = Po (x + a) (y + b)
-
-instance Monoid Pos where
-  mempty = Po 0 0
+import Graphics.Gloss
 
 data Player = Player {
-  pPos      :: Pos , --bottom center
-  pMomentum :: Pos ,
+  pPos      :: Point , --bottom center
+  pMomentum :: Point ,
   pUp       :: Bool ,
   pDown     :: Bool ,
   pLeft     :: Bool ,
@@ -24,8 +19,8 @@ data Player = Player {
 data EdgeType = Solid | Pass | Spike
 
 data Platform = Plat {
-  bL :: Pos,
-  tR :: Pos,
+  bL :: Point,
+  tR :: Point,
   fUp :: EdgeType,
   fDown :: EdgeType,
   fRight :: EdgeType,
