@@ -11,9 +11,12 @@ data Player = Player {
   pLeft     :: Bool ,
   pRight    :: Bool ,
   pShift    :: Bool ,
+  pJumping  :: Bool ,
+  pDashing  :: Bool ,
+  pBombing  :: Bool ,
   pJumps    :: Int ,
   pDashes   :: Int ,
-  pHp       :: Int
+  pHp       :: Int 
 }
 
 data EdgeType = Solid | Pass | Spike

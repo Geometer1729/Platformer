@@ -11,6 +11,29 @@ main = do
 
 world :: World
 world = World {
-  player = Player {pPos = (0,0)} ,
-  platforms = []
+  player = Player {
+    pPos = (0,0),
+    pMomentum = (0,0),
+    pUp = False,
+    pDown = False,
+    pLeft = False,
+    pRight = False,
+    pShift = False,
+    pJumping = False,
+    pDashing = False,
+    pBombing = False,
+    pJumps = 1,
+    pDashes = 1,
+    pHp = 5
+  },
+  platforms = [
+    Plat {
+      bL=(-100,-100),
+      tR=(100,0),
+      fUp = Solid,
+      fDown = Pass,
+      fLeft = Pass,
+      fRight = Pass
+    }
+  ]
 }
