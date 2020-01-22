@@ -3,27 +3,26 @@ module Handle where
 
 import Types
 import Graphics.Gloss.Interface.IO.Game
+import System.Exit
 
 toBool :: KeyState -> Bool
 toBool = \case
-  Down -> False
-  Up -> True
+  Down -> True
+  Up -> False
 
 handleWorld :: Event -> World -> IO World
-handleWorld e w = return $ handleWorld_ e w
-
-handleWorld_ :: Event -> World -> World
-handleWorld_ e w = case e of
+handleWorld e w = print e >> case e of
    EventKey (Char c) ks _ _ -> charKey (toBool ks) c w
-   _ -> w
+   _ -> return w
 
-charKey :: Bool -> Char -> World -> World
+charKey :: Bool -> Char -> World -> IO World
 charKey ks c w = case c of
-  'w' -> w{player=(player w){pUp    =ks}}
-  'a' -> w{player=(player w){pLeft  =ks}}
-  's' -> w{player=(player w){pDown  =ks}}
-  'd' -> w{player=(player w){pRight =ks}}
-  'j' -> w{player=(player w){pJumping =ks}}
-  'k' -> w{player=(player w){pDashing =ks}}
-  'l' -> w{player=(player w){pBombing =ks}}
-  _ -> w  
+  'w' -> return w{player=(player w){pUp    =ks}}
+  'a' -> return w{player=(player w){pLeft  =ks}}
+  's' -> return w{player=(player w){pDown  =ks}}
+  'd' -> return w{player=(player w){pRight =ks}}
+  'j' -> return w{player=(player w){pJumping =ks}}
+  'k' -> return w{player=(player w){pDashing =ks}}
+  'l' -> return w{player=(player w){pBombing =ks}}
+  'q' -> exitWith ExitSuccess
+  _   -> return w  

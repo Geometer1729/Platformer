@@ -7,7 +7,7 @@ renderWorld :: World -> IO Picture
 renderWorld = return . renderWorld_
 
 renderWorld_ :: World -> Picture
-renderWorld_ (World p ps) = Pictures (renderPlayer p:map renderPlatform ps)
+renderWorld_ (World p ps) = Pictures $ (map renderPlatform ps) ++ [renderPlayer p]
 
 renderPlayer :: Player -> Picture
 renderPlayer p = renderAt (pPos p) $ Color blue $ rectangleUpperSolid 20 20
