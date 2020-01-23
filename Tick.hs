@@ -54,14 +54,16 @@ tickWorld t w = let
                    | otherwise -> return $ glide t (0,0) w
 
       Floor  -> if | not $ touching (0,-1) w -> tickWorld t w{player=p{pContacting=Not}}
-                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(runSpeed p,800)}}
-                   | otherwise -> return $ glide t (0,0) w{player=p{pMomentum=(runSpeed p,0)}}
+                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(runSpeed w,800)}}
+                   | otherwise -> return $ glide t (0,0) w{player=p{pMomentum=(runSpeed w,0)}}
 
-runSpeed :: Player -> Float
-runSpeed p 
-  | pRight p && not (pLeft  p) =  100
-  | pLeft  p && not (pRight p) = -100
+runSpeed :: World -> Float
+runSpeed w 
+  | pRight p && not (pLeft  p) && not (touching ( 1,0) w) =  100
+  | pLeft  p && not (pRight p) && not (touching (-1,0) w) = -100
   | otherwise                  =  0
+  where
+    p = player w
 
 touching :: Point -> World -> Bool
 touching v w = isJust $ collision 1 w{player=(player w){pPos=(pPos (player w)) .- v,pMomentum=2 .* v}}
