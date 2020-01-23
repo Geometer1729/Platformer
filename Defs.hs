@@ -15,7 +15,7 @@ plat = Plat {
 plat2 :: Platform
 plat2 = Plat {
       bL=(150,50),
-      tR=(250,150),
+      tR=(250,250),
       fUp = Solid,
       fDown = Solid,
       fLeft = Solid,

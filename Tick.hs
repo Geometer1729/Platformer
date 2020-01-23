@@ -20,7 +20,7 @@ l2 :: Point -> Float
 l2 (a,b) = sqrt $ a*a + b*b
 
 g :: Point
-g = (0,-40)
+g = (0,-32000)
 
 (.*) :: Float -> Point -> Point
 a .* (x,y) = (a*x,a*y)
@@ -65,7 +65,7 @@ glide t a w = let
   pos = pPos p
   moment = pMomentum p
   pos' = pos .+ (t .* moment)
-  moment' = moment .+ a
+  moment' = moment .+ ((t*t) .* a)
   in w{player=p{pPos=pos',pMomentum=moment'}}
 
 collision :: Float -> World -> Maybe Collision
