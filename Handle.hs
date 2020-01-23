@@ -11,7 +11,7 @@ toBool = \case
   Up -> False
 
 handleWorld :: Event -> World -> IO World
-handleWorld e w = print e >> case e of
+handleWorld e w = case e of
    EventKey (Char c) ks _ _ -> charKey (toBool ks) c w
    _ -> return w
 

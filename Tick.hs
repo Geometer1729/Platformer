@@ -8,7 +8,7 @@ import Graphics.Gloss.Geometry.Line
 import Safe.Foldable
 import Control.Monad
 
-import Debug.Trace
+--import Debug.Trace
 
 (.+) :: Point -> Point -> Point
 (x,y) .+ (a,b) = (x+a,y+b)
@@ -24,10 +24,6 @@ g = (0,-40)
 
 (.*) :: Float -> Point -> Point
 a .* (x,y) = (a*x,a*y)
-
-{-
- - First 
- -}
 
 tickWorld :: Float -> World -> IO World
 tickWorld t w = let
@@ -49,14 +45,15 @@ tickWorld t w = let
             CLeft  -> (0,-80)
             CRight -> (0,-80)
           w' = w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
-          in traceShow col $ tickWorld (t-t') w' -- move for the remainder of the tick
+          in tickWorld (t-t') w' -- move for the remainder of the tick
     CLeft -> if pJumping p 
       then tickWorld t w{player=p{pContacting=Not,pMomentum=(100,400)}}
       else return $ glide t (0,0) w
     CRight -> if pJumping p 
       then tickWorld t w{player=p{pContacting=Not,pMomentum=(-100,400)}}
       else return $ glide t (0,0) w
-    Floor -> if | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(fst $ pMomentum p,800)}}
+    Floor -> if | isNothing $ collision 1 w{player=p{pPos=(pPos p) .+ (0,1),pMomentum=(0,-2)}} -> tickWorld t w{player=p{pContacting=Not}}
+                | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(fst $ pMomentum p,800)}}
                 | pRight p && not (pLeft p)  -> return $ glide t (0,0) w{player=p{pMomentum=( 100,0)}}
                 | pLeft p  && not (pRight p) -> return $ glide t (0,0) w{player=p{pMomentum=(-100,0)}}
                 | otherwise -> return w{player=p{pMomentum=(0,0)}}
