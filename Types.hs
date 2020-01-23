@@ -24,7 +24,7 @@ data Player = Player {
 
 data EdgeType = Solid | Pass | Spike deriving Show
 
-data Contacting = Not | CLeft | CRight | Floor deriving Show
+data Contacting = Not | CLeft | CRight | Floor deriving (Eq,Show)
 
 data Platform = Plat {
   bL :: Point,
