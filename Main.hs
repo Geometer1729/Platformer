@@ -8,5 +8,5 @@ import Defs
 
 main :: IO ()
 main = do
-  playIO (InWindow "Platformer" (1600,900) (50,50)) black 30 world renderWorld handleWorld tickWorld
+  playIO (InWindow "Platformer" (1600,900) (50,50)) black 60 world renderWorld handleWorld tickWorld
 

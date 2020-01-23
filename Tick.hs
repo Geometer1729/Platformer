@@ -20,7 +20,7 @@ l2 :: Point -> Float
 l2 (a,b) = sqrt $ a*a + b*b
 
 g :: Point
-g = (0,-8000)
+g = (0,-1200)
 
 (.*) :: Float -> Point -> Point
 a .* (x,y) = (a*x,a*y)
@@ -46,17 +46,23 @@ tickWorld t w = let
             CRight -> (0,-80)
           w' = w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
           in tickWorld (t-t') w' -- move for the remainder of the tick
-    CLeft -> if pJumping p 
-      then tickWorld t w{player=p{pContacting=Not,pMomentum=(100,400)}}
-      else return $ glide t (0,0) w
-    CRight -> if pJumping p 
-      then tickWorld t w{player=p{pContacting=Not,pMomentum=(-100,400)}}
-      else return $ glide t (0,0) w
-    Floor -> if | isNothing $ collision 1 w{player=p{pPos=(pPos p) .+ (0,1),pMomentum=(0,-2)}} -> tickWorld t w{player=p{pContacting=Not}}
-                | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(fst $ pMomentum p,800)}}
-                | pRight p && not (pLeft p)  -> return $ glide t (0,0) w{player=p{pMomentum=( 100,0)}}
-                | pLeft p  && not (pRight p) -> return $ glide t (0,0) w{player=p{pMomentum=(-100,0)}}
-                | otherwise -> return w{player=p{pMomentum=(0,0)}}
+
+    CLeft  -> if | not $ touching (-1,0) w -> tickWorld t w{player=p{pContacting=Not}}
+                 | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(100,400)}}
+                 | otherwise  -> return $ glide t (0,0) w
+
+    CRight -> if | not $ touching (1,0) w -> tickWorld t w{player=p{pContacting=Not}}
+                 | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(-100,400)}}
+                 | otherwise -> return $ glide t (0,0) w
+
+    Floor  -> if | not $ touching (0,-1) w -> tickWorld t w{player=p{pContacting=Not}}
+                 | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(fst $ pMomentum p,800)}}
+                 | pRight p && not (pLeft p)  -> return $ glide t (0,0) w{player=p{pMomentum=( 100,0)}}
+                 | pLeft p  && not (pRight p) -> return $ glide t (0,0) w{player=p{pMomentum=(-100,0)}}
+                 | otherwise -> return w{player=p{pMomentum=(0,0)}}
+
+touching :: Point -> World -> Bool
+touching v w = isJust $ collision 1 w{player=(player w){pPos=(pPos (player w)) .- v,pMomentum=2 .* v}}
       
 
 glide :: Float -> Point -> World -> World
