@@ -86,12 +86,16 @@ collision t w = let
   rectEdges = platforms w >>= paths
   intersects = catMaybes [ do
     p <- (intersectSegSeg p1 p2 p3 p4) 
-    return (p .- o,c)
+    return (p .- o,c,o)
     | ((p1,p2), o) <- cornerPaths , (p3,p4,c) <- rectEdges ]
   in minimumMay ( do
-      (p,c) <- intersects
+      (p,c,o) <- intersects
       let t' = t*(l2 (p .- p0))/(l2 dp0)
-      _ <- guard $ t' > 0
+      _ <- guard $ t' > 0 && case c of
+        Not    -> snd o > 10 && dy > 0
+        CLeft  -> fst o < 0  && dx < 0
+        CRight -> fst o > 0  && dx > 0
+        Floor  -> snd o < 10 && dy < 0
       return Collision{
         time=t',
         location=p,

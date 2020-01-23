@@ -21,6 +21,17 @@ plat2 = Plat {
       fLeft = Solid,
       fRight = Solid
     }
+
+plat3 :: Platform
+plat3 = Plat {
+      bL=(-100,-50),
+      tR=(-50,200),
+      fUp = Solid,
+      fDown = Solid,
+      fLeft = Solid,
+      fRight = Solid
+    }
+
 play :: Player
 play = Player {
     pPos = (0,0),
@@ -42,5 +53,5 @@ play = Player {
 world :: World
 world = World {
   player = play ,
-  platforms = [plat,plat2]
+  platforms = [plat,plat2,plat3]
 }
