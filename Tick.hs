@@ -41,7 +41,9 @@ tickWorld t w = let
           Not    -> (fst moment,0)
           CLeft  -> (0,-80)
           CRight -> (0,-80)
-        w' = w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
+        w' = if ct `elem` [CLeft,CRight] && touching (0,-1) w
+          then w{player=p{pPos=loc,pContacting=Floor,pMomentum=(0,0)}}
+          else w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
       in tickWorld (t-t') w' -- move for the remainder of the tick
     _ -> case contacting of
       Not    -> return $ glide t g w
