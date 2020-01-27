@@ -54,4 +54,5 @@ world :: World
 world = World {
   player = play ,
   platforms = [plat,plat2,plat3]
-}
+} 
+

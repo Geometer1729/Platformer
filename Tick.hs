@@ -19,11 +19,27 @@ import Control.Monad
 l2 :: Point -> Float
 l2 (a,b) = sqrt $ a*a + b*b
 
-g :: Point
-g = (0,-1200)
+slideSpeed,wJumpH,wJumpV,jumpV,runSpeed,g :: Float
+wJumpH = 200
+wJumpV = 600
+jumpV  = 800
+slideSpeed = 80
+runSpeed = 200
+g = 1200
+
+gv :: Point
+gv = (0,-g)
+
+
 
 (.*) :: Float -> Point -> Point
 a .* (x,y) = (a*x,a*y)
+
+tickWorldDebug :: Float -> World -> IO World
+tickWorldDebug t w = do
+  w' <- tickWorld t w
+  appendFile "./log" (unlines [show t,show w,show w'])
+  return w'
 
 tickWorld :: Float -> World -> IO World
 tickWorld t w = let
@@ -31,7 +47,7 @@ tickWorld t w = let
   contacting = pContacting p
   mc = collision t w
   in case mc of
-    Just col | conType col /= contacting ->  let
+    Just col ->  let
         loc = location col
         t' = time col
         ct = conType col
@@ -39,36 +55,36 @@ tickWorld t w = let
         moment' = case ct of
           Floor  -> (fst moment,0)
           Not    -> (fst moment,0)
-          CLeft  -> (0,-80)
-          CRight -> (0,-80)
+          CLeft  -> (0,-slideSpeed)
+          CRight -> (0,-slideSpeed)
         w' = if ct `elem` [CLeft,CRight] && touching (0,-1) w
           then w{player=p{pPos=loc,pContacting=Floor,pMomentum=(0,0)}}
           else w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
       in tickWorld (t-t') w' -- move for the remainder of the tick
-    _ -> case contacting of
-      Not    -> return $ glide t g w
+    Nothing -> case contacting of
+      Not    -> return $ glide t gv w
       CLeft  -> if | not $ touching (-1,0) w -> tickWorld t w{player=p{pContacting=Not}}
-                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(100,400)}}
+                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(wJumpH,wJumpV)}}
                    | otherwise  -> return $ glide t (0,0) w
 
       CRight -> if | not $ touching (1,0) w -> tickWorld t w{player=p{pContacting=Not}}
-                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(-100,400)}}
+                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(-wJumpH,wJumpV)}}
                    | otherwise -> return $ glide t (0,0) w
 
       Floor  -> if | not $ touching (0,-1) w -> tickWorld t w{player=p{pContacting=Not}}
-                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(runSpeed w,800)}}
-                   | otherwise -> return $ glide t (0,0) w{player=p{pMomentum=(runSpeed w,0)}}
+                   | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(runV w,jumpV)}}
+                   | otherwise -> return $ glide t (0,0) w{player=p{pMomentum=(runV w,0)}}
 
-runSpeed :: World -> Float
-runSpeed w 
-  | pRight p && not (pLeft  p) && not (touching ( 1,0) w) =  100
-  | pLeft  p && not (pRight p) && not (touching (-1,0) w) = -100
+runV :: World -> Float
+runV w 
+  | pRight p && not (pLeft  p) && not (touching ( 1,0) w) =  runSpeed
+  | pLeft  p && not (pRight p) && not (touching (-1,0) w) = -runSpeed
   | otherwise                  =  0
   where
     p = player w
 
 touching :: Point -> World -> Bool
-touching v w = isJust $ collision 1 w{player=(player w){pPos=(pPos (player w)) .- v,pMomentum=2 .* v}}
+touching v w = isJust $ collision 1 w{player=(player w){pPos=(pPos (player w)) .- v,pMomentum=2 .* v,pContacting=Not}}
       
 
 glide :: Float -> Point -> World -> World
@@ -84,7 +100,7 @@ collision :: Float -> World -> Maybe Collision
 collision t w = let
   pl        = player w
   p0        = pPos pl
-  dp0@(dx,dy) = t .* (pMomentum pl)
+  dp0@(dx,dy) = (1.0001 * t) .* (pMomentum pl)
   offSets = [(-10,0),(10,0),(-10,20),(10,20)]
   cornerStarts = [ (p0 .+ o,o) | o <- offSets ]
   cornerPaths = [ ( ((x,y),(x+dx,y+dy)) ,o) | ((x,y),o) <- cornerStarts ]
@@ -96,11 +112,12 @@ collision t w = let
   in minimumMay ( do
       (p,c,o) <- intersects
       let t' = t*(l2 (p .- p0))/(l2 dp0)
-      _ <- guard $ t' > 0 && case c of
+      _ <- guard $ (c /= pContacting pl) && ( case c of
         Not    -> snd o > 10 && dy > 0
         CLeft  -> fst o < 0  && dx < 0
         CRight -> fst o > 0  && dx > 0
         Floor  -> snd o < 10 && dy < 0
+          )
       return Collision{
         time=t',
         location=p,
@@ -113,5 +130,4 @@ paths p  = let
   (r,t) = tR p
   [p1,p2,p3,p4] = [(l,b),(r,b),(r,t),(l,t)]
   in [ (p1,p2,Not),(p2,p3,CLeft),(p3,p4,Floor),(p4,p1,CRight) ]
-  
 

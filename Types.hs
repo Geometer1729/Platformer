@@ -20,11 +20,11 @@ data Player = Player {
   pJumps      :: Int ,
   pDashes     :: Int ,
   pHp         :: Int 
-} deriving Show -- shows are derivied for debuging
+} deriving (Show,Read) -- shows are derivied for debuging
 
-data EdgeType = Solid | Pass | Spike deriving Show
+data EdgeType = Solid | Pass | Spike deriving (Show,Read)
 
-data Contacting = Not | CLeft | CRight | Floor deriving (Eq,Show)
+data Contacting = Not | CLeft | CRight | Floor deriving (Eq,Show,Read)
 
 data Platform = Plat {
   bL :: Point,
@@ -33,18 +33,18 @@ data Platform = Plat {
   fDown :: EdgeType,
   fRight :: EdgeType,
   fLeft :: EdgeType
-} deriving Show
+} deriving (Show,Read)
 
 data World = World {
   player :: Player,
   platforms :: [Platform]
-} deriving Show
+} deriving (Show,Read)
 
 data Collision = Collision {
     time :: Float,
     location :: Point,
     conType :: Contacting -- in this case Not indicates a ceiling collision
-} deriving Show
+} deriving (Show,Read)
 
 instance Eq Collision  where
   (==) = (==) `on` time
