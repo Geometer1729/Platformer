@@ -1,0 +1,18 @@
+Bugs
+
+	Upward collisions are not detected
+
+Features
+
+	Axe throwing
+
+		Get axe back when you're on land and haven't thrown an axe for some amount of time
+		Maybe kick back?
+		You can throw an axe only once while in the air, unless you catch an axe
+		You can jump off axes in the air
+
+	Shield
+
+		Not die from your axes allowing you to be thrown by them
+		Shield slide on slippery platforms for dramatic speed
+		shield slide on some types hazardous surfaces

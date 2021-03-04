@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiWayIf#-} 
+{-# LANGUAGE MultiWayIf#-}
 module Tick where
 
 import Types
@@ -62,7 +62,7 @@ tickWorld t w = let
           Not -> pDashes p
           _ -> 1
         p' = p{pPos=loc,pDashes=dashes'}
-        p''=if ct `elem` [CLeft,CRight] && touching (0,-1) w 
+        p''=if ct `elem` [CLeft,CRight] && touching (0,-1) w
           then p'{pContacting=Floor,pMomentum=(0,0)  }
           else p'{pContacting=ct   ,pMomentum=moment'}
         w' = w{player=p''}
@@ -94,7 +94,7 @@ dashV p = let
   in (dx,dy)
 
 runV :: World -> Float
-runV w 
+runV w
   | pRight p && not (pLeft  p) && not (touching ( 1,0) w) =  runSpeed
   | pLeft  p && not (pRight p) && not (touching (-1,0) w) = -runSpeed
   | otherwise                  =  0
@@ -103,10 +103,10 @@ runV w
 
 touching :: Point -> World -> Bool
 touching v w = isJust $ collision 1 w{player=(player w){pPos=(pPos (player w)) .- v,pMomentum=2 .* v,pContacting=Not}}
-      
+
 
 glide :: Float -> Point -> World -> World
-glide t a w = let 
+glide t a w = let
   p = player w
   pos = pPos p
   moment = pMomentum p
@@ -124,7 +124,7 @@ collision t w = let
   cornerPaths = [ ( ((x,y),(x+dx,y+dy)) ,o) | ((x,y),o) <- cornerStarts ]
   rectEdges = platforms w >>= paths
   intersects = catMaybes [ do
-    p <- (intersectSegSeg p1 p2 p3 p4) 
+    p <- (intersectSegSeg p1 p2 p3 p4)
     return (p .- o,c,o)
     | ((p1,p2), o) <- cornerPaths , (p3,p4,c) <- rectEdges ]
   in minimumMay ( do
