@@ -19,10 +19,11 @@ import Control.Monad
 l2 :: Point -> Float
 l2 (a,b) = sqrt $ a*a + b*b
 
-slideSpeed,wJumpH,wJumpV,jumpV,runSpeed,g :: Float
+slideSpeed,wJumpH,wJumpV,jumpV,dashS,runSpeed,g :: Float
 wJumpH = 200
 wJumpV = 600
 jumpV  = 800
+dashS  = 600
 slideSpeed = 80
 runSpeed = 200
 g = 1200
@@ -57,12 +58,19 @@ tickWorld t w = let
           Not    -> (fst moment,0)
           CLeft  -> (0,-slideSpeed)
           CRight -> (0,-slideSpeed)
-        w' = if ct `elem` [CLeft,CRight] && touching (0,-1) w
-          then w{player=p{pPos=loc,pContacting=Floor,pMomentum=(0,0)}}
-          else w{player=p{pPos=loc,pContacting=ct,pMomentum=moment'}}
+        dashes' = case ct of
+          Not -> pDashes p
+          _ -> 1
+        p' = p{pPos=loc,pDashes=dashes'}
+        p''=if ct `elem` [CLeft,CRight] && touching (0,-1) w 
+          then p'{pContacting=Floor,pMomentum=(0,0)  }
+          else p'{pContacting=ct   ,pMomentum=moment'}
+        w' = w{player=p''}
       in tickWorld (t-t') w' -- move for the remainder of the tick
     Nothing -> case contacting of
-      Not    -> return $ glide t gv w
+      Not    -> if | pDashing p && pDashes p > 0 -> return $ glide t gv w{player=p{pMomentum=dashV p,pDashes=pDashes p-1}}
+                   | otherwise  -> return $ glide t gv w
+
       CLeft  -> if | not $ touching (-1,0) w -> tickWorld t w{player=p{pContacting=Not}}
                    | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(wJumpH,wJumpV)}}
                    | otherwise  -> return $ glide t (0,0) w
@@ -74,6 +82,16 @@ tickWorld t w = let
       Floor  -> if | not $ touching (0,-1) w -> tickWorld t w{player=p{pContacting=Not}}
                    | pJumping p -> tickWorld t w{player=p{pContacting=Not,pMomentum=(runV w,jumpV)}}
                    | otherwise -> return $ glide t (0,0) w{player=p{pMomentum=(runV w,0)}}
+
+dashV :: Player -> Point
+dashV p = let
+  dx = if | pRight p && not (pLeft  p) ->  dashS
+          | pLeft  p && not (pRight p) -> -dashS
+          | otherwise -> 0
+  dy = if | pUp    p && not (pDown  p) ->  dashS
+          | pDown  p && not (pUp    p) -> -dashS
+          | otherwise -> 0
+  in (dx,dy)
 
 runV :: World -> Float
 runV w 
