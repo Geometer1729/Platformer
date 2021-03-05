@@ -1,0 +1,13 @@
+
+Goodly libraries
+gloss - the asiago cheese bread and cream cheese of this project
+alut - audio
+lens - for working with data types, can be a little cumbersome without the combinators
+containers - lists suck. maybe we could use maps or sets instead
+apecs/yampa/netwire , ways to structure things like event handling and time.
+> apecs is a ecs. easy to understand, components are a good way to specify that certain objects have collision, apecs-gloss exists, but we'd need to modify it so that we could do audio
+> yampa/netwire are FRP libraries. Gives us a notion of time and event handling. Both use arrow notation
+
+Maybe libraries
+comonad - Good for context-dependent computations. Might be useful for physics handling
+pipes - Input/output epicness. Lets us program with producers and consumers. And ListT. Perhaps useful for dealing with configs in a elegant way
